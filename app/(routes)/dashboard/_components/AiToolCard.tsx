@@ -28,6 +28,10 @@ const AiToolCard = ({ tool }: { tool: AiToolCardProps }) => {
       router.push(`${tool.path}/${recordId}`);
       return;
     }
+    if (tool.name === "Mock Interview Generator") {
+      router.push(`${tool.path}`);
+      return;
+    }
     await fetch("/api/history", {
       method: "POST",
       body: JSON.stringify({ recordId: recordId, content: [] }),

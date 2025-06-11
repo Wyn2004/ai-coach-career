@@ -1,3 +1,11 @@
+import {
+  BriefcaseBusinessIcon,
+  Code2Icon,
+  Puzzle,
+  User2Icon,
+  UserRoundCheckIcon,
+} from "lucide-react";
+
 const aiToolsList = [
   {
     name: "AI Career Q&A Chat",
@@ -21,12 +29,35 @@ const aiToolsList = [
     path: "/ai-tools/ai-roadmap",
   },
   {
-    name: "Cover Letter Generator",
-    desc: "Write a cover letter",
+    name: "Mock Interview Generator",
+    desc: "Prepare for your interview",
     icon: "/resume.png",
     button: "Create now",
-    path: "/cover-letter-generator",
+    path: "/ai-mock-interview",
   },
 ];
 
-export { aiToolsList };
+const interviewTypes = [
+  {
+    name: "Technical",
+    icon: Code2Icon,
+  },
+  {
+    name: "Behavioral",
+    icon: User2Icon,
+  },
+  {
+    name: "Experienced",
+    icon: BriefcaseBusinessIcon,
+  },
+  {
+    name: "Problem Solving",
+    icon: Puzzle,
+  },
+  {
+    name: "Leadership",
+    icon: UserRoundCheckIcon,
+  },
+];
+
+export { aiToolsList, interviewTypes };

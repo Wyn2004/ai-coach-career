@@ -29,3 +29,11 @@ export const historyTable = pgTable("historyTable", {
   roleDecriptions: varchar(),
   createdAt: timestamp().notNull().defaultNow(),
 });
+
+export const questionInterviewTable = pgTable("questionInterviewTable", {
+  id: varchar().primaryKey(),
+  questionList: json(),
+  jobDescription: varchar(),
+  userEmail: varchar("userEmail").references(() => usersTable.email),
+  createdAt: timestamp().notNull().defaultNow(),
+});
