@@ -1,8 +1,9 @@
 import { db } from "@/configs/db";
-import { questionInterviewTable } from "@/configs/schema";
+import { interviewTable } from "@/configs/schema";
 import { inngest } from "@/inngest/client";
 import { currentUser } from "@clerk/nextjs/server";
 import { WebPDFLoader } from "@langchain/community/document_loaders/web/pdf";
+import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -14,6 +15,33 @@ export async function POST(req: Request) {
   }
 
   return await handleGenerateInterviewQuestions(req);
+}
+
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+  const user = await currentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const userEmail = user?.primaryEmailAddress?.emailAddress as string;
+  try {
+    const whereConditions = id
+      ? and(eq(interviewTable.id, id), eq(interviewTable.userEmail, userEmail))
+      : eq(interviewTable.userEmail, userEmail);
+    const response = await db
+      .select()
+      .from(interviewTable)
+      .where(whereConditions);
+
+    return NextResponse.json(response, { status: 200 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      { error: "Failed to get interviews" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function handleGenerateInterviewQuestions(req: Request) {
@@ -71,7 +99,15 @@ export async function handleGenerateInterviewQuestions(req: Request) {
 
 export async function handleSaveQuestionInterview(req: Request) {
   const payload = await req.json();
-  const { questionList, id, job_descriptions } = payload;
+  const {
+    questionList,
+    id,
+    job_description,
+    question_count,
+    total_estimated_duration,
+    interview_type,
+    role,
+  } = payload;
 
   const user = await currentUser();
 
@@ -81,10 +117,14 @@ export async function handleSaveQuestionInterview(req: Request) {
 
   const userEmail = user?.primaryEmailAddress?.emailAddress;
 
-  await db.insert(questionInterviewTable).values({
+  await db.insert(interviewTable).values({
     questionList,
     id,
-    jobDescription: job_descriptions,
+    question_count,
+    total_estimated_duration,
+    interview_type,
+    job_description: job_description,
+    role: role,
     userEmail,
   });
   return NextResponse.json({ success: true });

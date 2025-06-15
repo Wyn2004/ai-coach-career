@@ -13,7 +13,14 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Calendar, CircleUser, Inbox, Layers, Wallet } from "lucide-react";
+import {
+  Calendar,
+  CircleUser,
+  Contact2Icon,
+  Inbox,
+  Layers,
+  Wallet,
+} from "lucide-react";
 
 const items = [
   {
@@ -25,6 +32,11 @@ const items = [
     title: "AI Tools",
     url: "/ai-tools",
     icon: Inbox,
+  },
+  {
+    title: "AI Mock Interview",
+    url: "/ai-mock-interview",
+    icon: Contact2Icon,
   },
   {
     title: "My History",

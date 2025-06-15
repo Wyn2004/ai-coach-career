@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/navigation";
 interface InterviewQuestion {
   estimated_time_minutes: number;
   question: string;
@@ -37,6 +38,7 @@ const QuestionList = ({ formData }: { formData: FormDataInterView }) => {
     null
   );
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   // Function to get icon based on question type
   const getTypeIcon = (type: string) => {
@@ -112,7 +114,11 @@ const QuestionList = ({ formData }: { formData: FormDataInterView }) => {
     const id = uuidv4();
     const data = {
       questionList: questionsData?.interviewQuestions,
-      job_descriptions: questionsData?.job_descriptions,
+      job_description: questionsData?.job_descriptions,
+      question_count: questionsData?.question_count,
+      total_estimated_duration: questionsData?.total_estimated_duration,
+      interview_type: questionsData?.interview_type,
+      role: questionsData?.role,
       id,
     };
     const response = await fetch(
@@ -122,9 +128,9 @@ const QuestionList = ({ formData }: { formData: FormDataInterView }) => {
         body: JSON.stringify(data),
       }
     );
-    const dataResponse = await response.json();
-    console.log(dataResponse);
+    await response.json();
     setSaveLoading(false);
+    router.push(`/ai-mock-interview/${id}`);
   };
 
   return (
@@ -230,7 +236,7 @@ const QuestionList = ({ formData }: { formData: FormDataInterView }) => {
             ))}
           </div>
           <Button onClick={onFinish} disabled={saveLoading}>
-            {saveLoading ? "Saving..." : "Finish"}
+            {saveLoading ? "Creating Interview..." : "Create Interview"}
             <SendIcon className="w-4 h-4" />
           </Button>
         </div>

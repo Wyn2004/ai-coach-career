@@ -3,7 +3,7 @@ import { WebPDFLoader } from "@langchain/community/document_loaders/web/pdf";
 import { inngest } from "@/inngest/client";
 import { AiAgentType } from "@/configs/schema";
 import { currentUser } from "@clerk/nextjs/server";
-
+import { Document } from "langchain/document";
 export async function POST(req: Request) {
   const formData = await req.formData();
   const { recordId, analysisType, cvFile, jdFile, describeRole } =
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     );
   }
 
-  if (!(jdFile instanceof File)) {
+  if (analysisType === "jd" && !(jdFile instanceof File)) {
     return NextResponse.json(
       { error: "jdFile must be a File" },
       { status: 400 }
@@ -30,12 +30,20 @@ export async function POST(req: Request) {
   const arrayBufferCv = await cvFile.arrayBuffer();
   const base64Cv = Buffer.from(arrayBufferCv).toString("base64");
 
-  const loaderJd = new WebPDFLoader(jdFile);
-  const docsJd = await loaderJd.load();
-  const plainTextJd = docsJd.map((d) => d.pageContent).join("\n");
+  let loaderJd: WebPDFLoader | null = null;
+  let docsJd: Document[] | null = null;
+  let plainTextJd: string | null = null;
+  let base64Jd: string | null = null;
+  let arrayBufferJd: ArrayBuffer | null = null;
 
-  const arrayBufferJd = await jdFile.arrayBuffer();
-  const base64Jd = Buffer.from(arrayBufferJd).toString("base64");
+  if (analysisType === "jd" && jdFile instanceof File) {
+    loaderJd = new WebPDFLoader(jdFile);
+    docsJd = await loaderJd.load();
+    plainTextJd = docsJd.map((d) => d.pageContent).join("\n");
+
+    arrayBufferJd = await jdFile.arrayBuffer();
+    base64Jd = Buffer.from(arrayBufferJd).toString("base64");
+  }
 
   const aiAgentType =
     analysisType === "role"
